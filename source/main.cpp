@@ -5,7 +5,7 @@
 #endif
 
 #undef main
-#include "Renderer.h"
+#include "CombinedRenderer.h"
 
 using namespace dae;
 
@@ -28,7 +28,7 @@ int main(int argc, char* args[])
 	const uint32_t height = 480;
 
 	SDL_Window* pWindow = SDL_CreateWindow(
-		"DirectX - ***Insert Name/Class***",
+		"DirectX - ***Rafi Osmanu/GD15***",
 		SDL_WINDOWPOS_UNDEFINED,
 		SDL_WINDOWPOS_UNDEFINED,
 		width, height, 0);
@@ -38,7 +38,7 @@ int main(int argc, char* args[])
 
 	//Initialize "framework"
 	const auto pTimer = new Timer();
-	const auto pRenderer = new Renderer(pWindow);
+	const auto pRenderer = new CombinedRenderer(pWindow);
 
 	//Start loop
 	pTimer->Start();
@@ -57,7 +57,8 @@ int main(int argc, char* args[])
 				break;
 			case SDL_KEYUP:
 				//Test for a key
-				//if (e.key.keysym.scancode == SDL_SCANCODE_X)
+				if (e.key.keysym.scancode == SDL_SCANCODE_F6)
+					pRenderer->SwitchProcces();
 				break;
 			default: ;
 			}
