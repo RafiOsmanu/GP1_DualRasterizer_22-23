@@ -57,8 +57,28 @@ int main(int argc, char* args[])
 				break;
 			case SDL_KEYUP:
 				//Test for a key
-				if (e.key.keysym.scancode == SDL_SCANCODE_F6)
+				if (e.key.keysym.scancode == SDL_SCANCODE_F1)
 					pRenderer->SwitchProcces();
+				else if (e.key.keysym.scancode == SDL_SCANCODE_F2)
+					pRenderer->ToggleVehicleRotation();
+				else if (e.key.keysym.scancode == SDL_SCANCODE_F3)
+					pRenderer->ToggleCombustionRender();
+				else if (e.key.keysym.scancode == SDL_SCANCODE_F4)
+					pRenderer->ToggleTechniquePass();
+				else if (e.key.keysym.scancode == SDL_SCANCODE_F5)
+					pRenderer->ToggleSWRenderOutput();
+				else if (e.key.keysym.scancode == SDL_SCANCODE_F6)
+					pRenderer->ToggleNormalMapSW();
+				else if (e.key.keysym.scancode == SDL_SCANCODE_F7)
+					pRenderer->ToggleDepthVisualization();
+				else if (e.key.keysym.scancode == SDL_SCANCODE_F8)
+					pRenderer->ToggleBoundingBoxesVisual();
+				else if (e.key.keysym.scancode == SDL_SCANCODE_F9)
+					pRenderer->ToggleCullMode();
+				else if (e.key.keysym.scancode == SDL_SCANCODE_F10)
+					pRenderer->ToggleUniform();
+				else if (e.key.keysym.scancode == SDL_SCANCODE_F11)
+					pTimer->ToggleFps();
 				break;
 			default: ;
 			}
@@ -76,7 +96,7 @@ int main(int argc, char* args[])
 		if (printTimer >= 1.f)
 		{
 			printTimer = 0.f;
-			std::cout << "dFPS: " << pTimer->GetdFPS() << std::endl;
+			pTimer->PrintFps();
 		}
 	}
 	pTimer->Stop();

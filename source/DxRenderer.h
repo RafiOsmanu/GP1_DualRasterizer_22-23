@@ -18,12 +18,18 @@ namespace dae
 		~DxRenderer();
 
 		virtual void Update(const Timer* pTimer) override;
-		void Render() const;
+		virtual void Render() const override;
 
-		void ToggleTechniquePass();
-		void Initialize(std::vector<Texture*>& mainTextures, Texture* extraTexture, Camera* pCamera, const Mesh& vehicleMesh, const Mesh& combustionMesh);
+		void DxToggleTechniquePass();
+		void Initialize(std::vector<Texture*>& mainTextures, Texture* extraTexture, Camera* pCamera, Mesh& vehicleMesh, Mesh& combustionMesh);
+		void ToggleRotation();
+		void DxToggleCullMode();
+		void DxToggleUniform();
+		void DxToggleCombustionRender();
+		
 
 	private:
+
 		
 		bool m_IsInitialized{ false };
 
@@ -53,12 +59,16 @@ namespace dae
 		MaterialCombustion* m_pCombustionMat;
 		
 		Camera* m_pCamera;
-		Mesh m_VehicleMesh;
-		Mesh m_CombustionMesh;
+		Mesh* m_pVehicleMesh;
+		Mesh* m_pCombustionMesh;
 
 
 		//DIRECTX
 		HRESULT InitializeDirectX();
-		//...
+		
+		//functionallity
+		bool m_IsRotating;
+		bool m_IsUniform;
+		bool m_IsCombustionRendering;
 	};
 }

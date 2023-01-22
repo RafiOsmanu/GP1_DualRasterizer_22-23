@@ -26,6 +26,11 @@ namespace dae
 		float GetElapsed() const { return m_ElapsedTime; };
 		float GetTotal() const { return m_TotalTime; };
 		bool IsRunning() const { return !m_IsStopped; };
+		void ToggleFps() {
+			if (m_IsPrinting) m_IsPrinting = false;
+			else m_IsPrinting = true;
+		};
+		void PrintFps();
 
 	private:
 		uint64_t m_BaseTime = 0;
@@ -46,5 +51,7 @@ namespace dae
 
 		bool m_IsStopped = true;
 		bool m_ForceElapsedUpperBound = false;
+
+		bool m_IsPrinting = true;
 	};
 }

@@ -32,8 +32,9 @@ namespace dae
 		void ToggleColorOutput();
 		void ToggleRenderOutput();
 		void ToggleNormalMap();
-		void ToggleRotation();
-		void Initialize(std::vector<Texture*>& mainTextures, Camera* pCamera, const Mesh& vehicleMesh);
+		void ToggleBoundingBox();
+		void ToggleUniformColor();
+		void Initialize(std::vector<Texture*>& mainTextures, Camera* pCamera, Mesh& vehicleMesh);
 
 	private:
 
@@ -57,24 +58,16 @@ namespace dae
 		bool m_NormalMapToggle{true};
 		bool m_RotationToggle{true};
 
-		//triangle worldSpace
-		std::vector<Mesh> m_Meshes =
-		{
-			Mesh
-			{
-				{
-				},
-				{
-				},
-			PrimitiveTopology::TriangleList
-			}
-		};
+		
+		Mesh* m_pMesh;
 
 		bool m_IsMeshLoadedIn;
+		bool m_BoundingBoxVisualization;
 		
 
 		//Function that transforms the vertices from the mesh from World space to Screen space
-		void VertexTransformationFunction(Mesh& mesh) const; //W1 Version
+		void VertexTransformationFunction(Mesh& mesh) const;
+
 		bool IsInTriangle(const std::vector<Vector2>& verticesScreenspace, const Vector2& pixelPos);
 		
 		void render_W4_Part1();
@@ -94,5 +87,7 @@ namespace dae
 		};
 
 		RenderState m_CurrentRenderState;
+
+		bool m_IsUniform;
 	};
 }

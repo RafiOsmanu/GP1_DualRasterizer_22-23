@@ -120,17 +120,16 @@ namespace dae
 
 		//6. Draw
 		D3DX11_TECHNIQUE_DESC techDesc{};
+
 		//from my own Effect Class
 		m_pMaterial->GetTechnique()->GetDesc(&techDesc);
 
 		//from material class
 		m_pMaterial->GetTechnique()->GetPassByIndex(pass)->Apply(0, pDeviceContext);
 		pDeviceContext->DrawIndexed(m_numIndices, 0, 0);
-		
-
 	}
 
-	void MeshHandler::TogglePass()
+	void MeshHandler::DxTogglePass()
 	{
 		pass = (pass + 1) % 3;
 	}

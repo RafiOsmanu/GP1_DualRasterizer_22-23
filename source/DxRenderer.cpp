@@ -7,6 +7,11 @@ namespace dae
 
 	DxRenderer::DxRenderer(SDL_Window* pWindow, ID3D11Device*& pDevice)
 		:BaseRenderer(pWindow)
+		, m_pVehicleMesh{nullptr}
+		, m_pCombustionMesh{nullptr}
+		, m_IsUniform{false}
+		, m_IsRotating{true}
+		, m_IsCombustionRendering{true}
 	{
 		//Initialize DirectX pipeline
 		const HRESULT result = InitializeDirectX();
@@ -19,7 +24,10 @@ namespace dae
 		{
 			std::cout << "DirectX initialization failed!\n";
 		}
+
+		//makes sure device u return has the value of the created device
 		pDevice = m_pDevice;
+		
 	}
 
 	DxRenderer::~DxRenderer()
@@ -43,10 +51,12 @@ namespace dae
 	void DxRenderer::Update(const Timer* pTimer) 
 	{
 		m_pCamera->Update(pTimer);
-		m_VehicleMesh.RotateMesh(pTimer);
-		m_VehicleMesh.Translate({ 0.f, 0.f, 50.f });
-		m_CombustionMesh.RotateMesh(pTimer);
-		m_CombustionMesh.Translate({ 0.f, 0.f, 50.f });
+		if (m_IsRotating)
+		{
+			m_pVehicleMesh->RotateMesh(pTimer);
+			m_pVehicleMesh->Translate({ 0.f, 0.f, 50.f });
+			m_pCombustionMesh->SetWorldMatrix(m_pVehicleMesh->worldMatrix);
+		}
 	}
 
 
@@ -54,36 +64,72 @@ namespace dae
 	{
 		if (!m_IsInitialized)
 			return;
+
 		//1. CLEAR RTV & DSV
-		ColorRGB clearColor = ColorRGB{ 0.39f, 0.59f, 93.f };
+		ColorRGB clearColor = ColorRGB{};
+
+		if (m_IsUniform) clearColor = COLOR_UNIFORM;
+
+		else clearColor = COLOR_HARDWARE;
+
+		
 		m_pDeviceContext->ClearRenderTargetView(m_pRenderTargetView, &clearColor.r);
 		m_pDeviceContext->ClearDepthStencilView(m_pDepthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.f, 0);
 
 		//2. Set PIPELINE + INVOKE DRAWCALLS (=RENDER)
-		m_pMeshHandler->Render(m_pDeviceContext, m_pCamera, m_VehicleMesh);
-		m_pMeshHandlerCombustions->Render(m_pDeviceContext, m_pCamera, m_CombustionMesh);
+		m_pMeshHandler->Render(m_pDeviceContext, m_pCamera, *m_pVehicleMesh);
+
+		//for toggle of combustion
+		if(m_IsCombustionRendering)
+		m_pMeshHandlerCombustions->Render(m_pDeviceContext, m_pCamera, *m_pCombustionMesh);
 
 		//3. PRESENT BACKBUFFER (SWAP)
 		m_pSwapChain->Present(0, 0);
 	}
 
-	void DxRenderer::ToggleTechniquePass()
+	void DxRenderer::DxToggleTechniquePass()
 	{
-		m_pMeshHandler->TogglePass();
-		m_pMeshHandlerCombustions->TogglePass();
+		m_pMeshHandler->DxTogglePass();
+		m_pMeshHandlerCombustions->DxTogglePass();
 	}
 
-	void DxRenderer::Initialize(std::vector<Texture*>& mainTextures, Texture* extraTexture, Camera* pCamera, const Mesh& vehicleMesh, const Mesh& combustionMesh)
+	void DxRenderer::ToggleRotation()
 	{
-		m_VehicleMesh = vehicleMesh;
-		m_CombustionMesh = combustionMesh;
+		if (m_IsRotating) m_IsRotating = false;
+
+		else m_IsRotating = true;
+	}
+
+	void DxRenderer::DxToggleCullMode()
+	{
+		m_pVehicleMaterial->ToggleCullMode();
+	}
+
+	void DxRenderer::DxToggleUniform()
+	{
+		if (m_IsUniform) m_IsUniform = false;
+
+		else m_IsUniform = true;
+	}
+
+	void DxRenderer::DxToggleCombustionRender()
+	{
+		if (m_IsCombustionRendering) m_IsCombustionRendering = false;
+
+		else m_IsCombustionRendering = true;
+	}
+
+	void DxRenderer::Initialize(std::vector<Texture*>& mainTextures, Texture* extraTexture, Camera* pCamera, Mesh& vehicleMesh, Mesh& combustionMesh)
+	{
+		m_pVehicleMesh = &vehicleMesh;
+		m_pCombustionMesh = &combustionMesh;
 		m_pCamera = pCamera;
 		
-
-		m_pVehicleMaterial = new MaterialVehicle{ m_pDevice, L"Resources/PosCol3D.fx", mainTextures };
+		//Init material for vehicle mesh and handle the mesh
+		m_pVehicleMaterial = new MaterialVehicle{ m_pDevice, m_pDeviceContext, L"Resources/PosCol3D.fx", mainTextures };
 		m_pMeshHandler = new MeshHandler{ m_pDevice, vehicleMesh, m_pVehicleMaterial };
 
-
+		//Init material for combustion mesh and handle the mesh
 		m_pCombustionMat = new MaterialCombustion{ m_pDevice,L"Resources/Combustion.fx", extraTexture };
 		m_pMeshHandlerCombustions = new MeshHandler{ m_pDevice, combustionMesh, m_pCombustionMat };
 	}

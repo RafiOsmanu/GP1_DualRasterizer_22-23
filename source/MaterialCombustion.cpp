@@ -12,6 +12,7 @@ namespace dae
 
 	MaterialCombustion::~MaterialCombustion()
 	{
+		m_pDiffuseMapVariable->Release();
 	}
 
 	void MaterialCombustion::SetResourceVariable()

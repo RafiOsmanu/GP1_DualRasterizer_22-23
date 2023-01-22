@@ -40,6 +40,9 @@ namespace dae
 	BaseMaterial::~BaseMaterial()
 	{
 		m_pEffect->Release();
+		//m_pMatWorldViewProjVariable->Release();
+		//m_pMatWorldVariable->Release();
+		//m_pMatInvViewVariable->Release();
 	}
 
 

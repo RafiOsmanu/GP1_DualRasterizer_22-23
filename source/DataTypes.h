@@ -34,6 +34,7 @@ namespace dae
 		std::vector<Vertex_PosCol> vertices{};
 		std::vector<uint32_t> indices{};
 		PrimitiveTopology primitiveTopology{ PrimitiveTopology::TriangleStrip };
+		Vector3 yawnPitchRoll{};
 
 		std::vector<Vertex_Out> vertices_out{};
 		Matrix worldMatrix{};
@@ -44,11 +45,17 @@ namespace dae
 
 		void RotateMesh(const Timer* timer)
 		{
-			const auto yawAngle = (PI_DIV_4 * (timer->GetTotal()));
+			//const auto yawAngle = (PI_DIV_4 * (timer->GetTotal()));
+			yawnPitchRoll.x += timer->GetElapsed();
 
-			const Matrix rotMatrix{ Matrix::CreateRotationY(yawAngle) };
+			const Matrix rotMatrix{ Matrix::CreateRotationY(yawnPitchRoll.x) };
 
 			worldMatrix = rotMatrix;
+		}
+
+		void SetWorldMatrix(Matrix& otherWorldMatrix)
+		{
+			worldMatrix = otherWorldMatrix;
 		}
 	};
 

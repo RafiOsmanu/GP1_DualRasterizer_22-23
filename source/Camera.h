@@ -44,7 +44,7 @@ namespace dae
 
 		void Update(const Timer* pTimer)
 		{
-			const float deltaTime = pTimer->GetElapsed();
+			const float& deltaTime = pTimer->GetElapsed();
 			const float CameraMovementSpeed{ 10.f };
 
 			//Camera Update Logic

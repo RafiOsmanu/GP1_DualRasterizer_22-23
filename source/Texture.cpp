@@ -20,7 +20,7 @@ namespace dae
 	{	
 		m_pResource->Release();
 		m_pSRV->Release();
-
+		
 		SDL_FreeSurface(m_pSurface);
 	}
 
@@ -71,8 +71,6 @@ namespace dae
 		SRVDesc.Texture2D.MipLevels = 1;
 
 		hr = pDevice->CreateShaderResourceView(m_pResource,&SRVDesc, &m_pSRV);
-		
-
 	}
 
 	ID3D11ShaderResourceView* Texture::GetResourceView()

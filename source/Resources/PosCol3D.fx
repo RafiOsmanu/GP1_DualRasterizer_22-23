@@ -12,7 +12,11 @@ Texture2D gGlossinessMap : GlossinessMap;
 float4x4 gWorldMatrix : WORLD;
 float4x4 gViewInverseMatrix : VIEWINVERSE;
 
+
 bool gUseNormal = true;
+
+
+
 
 
 float gPi = 3.14159265359f;
@@ -62,6 +66,8 @@ DepthStencilState gDepthStencilState
     StencilEnable = true;
 };
 
+
+
 //------------------------------------------------------------------
 // Input/Output Structs
 //------------------------------------------------------------------
@@ -91,7 +97,7 @@ struct VS_OUTPUT
 //------------------------------------------------------------------
 VS_OUTPUT VS(VS_INPUT input)
 {
-
+    
 	VS_OUTPUT output = (VS_OUTPUT)0;
 	output.Position = mul(float4(input.Position, 1.f), gWorldViewProj);
     output.WorldPosition = mul(float4(input.WorldPosition, 1.f), gWorldMatrix);
@@ -108,9 +114,10 @@ VS_OUTPUT VS(VS_INPUT input)
 
 float4 PixelShading(SamplerState sampleState, VS_OUTPUT input)
 {
-	
+    //[Cull(front)];
     float4 ambient = (0.025f, 0.025f, 0.025f, 0.025f);
     float3 viewDirection = normalize(input.WorldPosition.xyz - gViewInverseMatrix[3].xyz);
+	
 	
 	//diffuse reflectivity
 	const float kd = 1.f;
@@ -154,30 +161,20 @@ float4 PixelShading(SamplerState sampleState, VS_OUTPUT input)
 	
     return (lambertDiffuse * gLightIntensity + phong + ambient) * observedArea;
 
-    //return float3(observedArea, observedArea, observedArea);
-	
-    //return (phong);
-
 }
 
 float4 PS_Point(VS_OUTPUT input) : SV_TARGET
 {
-	//Output.RGBColor = g_MeshTexture.Sample(MeshTextureSampler, In.TextureUV) * In.Diffuse;
-	
-    //input.WorldPosition = PixelShading(samPoint, input);
-
     return PixelShading(samPoint, input);
 }
 
 float4 PS_Linear(VS_OUTPUT input) : SV_TARGET 
 {
-    //input.WorldPosition = PixelShading(samLinear, input);
     return PixelShading(samLinear, input);
 }
 
 float4 PS_Anisotropic(VS_OUTPUT input) : SV_TARGET 
 {
-    //input.WorldPosition = PixelShading(samAnisotropic, input);
     return PixelShading(samAnisotropic, input);
 }
 //------------------------------------------------------------------
@@ -187,6 +184,7 @@ technique11 Techniques
 {
 	pass p0
 	{
+        
         SetRasterizerState(gRasterizerState);
         SetDepthStencilState(gDepthStencilState, 0);
         SetBlendState(gBlendState, float4(0.0f, 0.0f, 0.0f, 0.0f), 0xFFFFFFFF);

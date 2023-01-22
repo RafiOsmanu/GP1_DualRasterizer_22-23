@@ -83,4 +83,12 @@ namespace dae
 			m_IsStopped = true;
 		}
 	}
+
+	void Timer::PrintFps()
+	{
+		if (m_IsPrinting)
+		{
+			std::cout << "dFPS: " << GetdFPS() << std::endl;
+		}
+	}
 }
