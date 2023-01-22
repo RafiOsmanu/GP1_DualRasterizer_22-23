@@ -17,6 +17,7 @@ SoftwareRenderer::SoftwareRenderer(SDL_Window* pWindow)
 	: BaseRenderer(pWindow)
 	, m_pMesh{nullptr}
 	, m_IsUniform{false}
+	, m_CullMode{CullMode::backFace}
 {
 	
 	//init depthBuffer
@@ -61,9 +62,10 @@ void SoftwareRenderer::Render()
 	
 	//clear buffer
 	if(!m_IsUniform)
-	SDL_FillRect(m_pBackBuffer, NULL, SDL_MapRGB(m_pBackBuffer->format, 255 * COLOR_HARDWARE.r, 255 * COLOR_HARDWARE.g, 255 * COLOR_HARDWARE.b));
+	SDL_FillRect(m_pBackBuffer, NULL, SDL_MapRGB(m_pBackBuffer->format, 255 * COLOR_SOFTWARE.r, 255 * COLOR_SOFTWARE.g, 255 * COLOR_SOFTWARE.b));
 	else
 	SDL_FillRect(m_pBackBuffer, NULL, SDL_MapRGB(m_pBackBuffer->format, 255 * COLOR_UNIFORM.r, 255 * COLOR_UNIFORM.g, 255 * COLOR_UNIFORM.b));
+
 
 	//@START
 	
@@ -207,8 +209,6 @@ void SoftwareRenderer::render_W4_Part1()
 					finalColor = colors::White;
 
 					//Update Color in Buffer
-					//finalColor.MaxToOne();
-
 					m_pBackBufferPixels[px + (py * m_Width)] = SDL_MapRGB(m_pBackBuffer->format,
 						static_cast<uint8_t>(finalColor.r * 255),
 						static_cast<uint8_t>(finalColor.g * 255),
@@ -224,25 +224,42 @@ void SoftwareRenderer::render_W4_Part1()
 					float area{ Vector2::Cross((vec1 - vec0), (vec2 - vec0)) };
 
 					//calculate weights
-					weight0 = triangleSide0 = Vector2::Cross(vec2 - vec1, (currentPixel - vec1)) / area;
-					weight1 = triangleSide1 = Vector2::Cross(vec0 - vec2, (currentPixel - vec2)) / area;
-					weight2 = triangleSide2 = Vector2::Cross(vec1 - vec0, (currentPixel - vec0)) / area;
+					//isInTriangleCheck
+
+					Vector2 edge0{ vec1 - vec0 };
+					Vector2 edge1{ vec2 - vec1 };
+					Vector2 edge2{ vec0 - vec2 };
+
+					weight0 = triangleSide0 = Vector2::Cross(edge0, (currentPixel - vec1));
+					weight1 = triangleSide1 = Vector2::Cross(edge1, (currentPixel - vec2));
+					weight2 = triangleSide2 = Vector2::Cross(edge2, (currentPixel - vec0));
 
 					float totalTriangleWeight{ weight0 + weight1 + weight2 };
 					float invTotalTriangleWeight{ 1 / totalTriangleWeight };
 
 
-					weight0 *= invTotalTriangleWeight;
-					weight1 *= invTotalTriangleWeight;
-					weight2 *= invTotalTriangleWeight;
+					weight0 = (weight0/ area) * invTotalTriangleWeight;
+					weight1 = (weight1/ area) * invTotalTriangleWeight;
+					weight2 = (weight2/ area) * invTotalTriangleWeight;
 
-					//isInTriangleCheck
-					if (triangleSide0 < 0) continue;
-					if (triangleSide1 < 0) continue;
-					if (triangleSide2 < 0) continue;
-
-
-
+					//CullMode check
+					switch (m_CullMode)
+					{
+					case dae::SoftwareRenderer::CullMode::frontFace:
+						if (triangleSide0 > 0) continue;
+						if (triangleSide1 > 0) continue;
+						if (triangleSide2 > 0) continue;
+						break;
+					case dae::SoftwareRenderer::CullMode::backFace:
+						if (triangleSide0 < 0) continue;
+						if (triangleSide1 < 0) continue;
+						if (triangleSide2 < 0) continue;
+						break;
+					case dae::SoftwareRenderer::CullMode::none:
+						//No check
+						break;
+					}
+					
 					//depth
 					//interpolatedZ
 					const float interpolatedZ =
@@ -497,6 +514,11 @@ void dae::SoftwareRenderer::ToggleUniformColor()
 	if (m_IsUniform) m_IsUniform = false;
 
 	else m_IsUniform = true;
+}
+
+void dae::SoftwareRenderer::SWToggleCullMode()
+{
+	m_CullMode = CullMode((int(m_CullMode) + 1) % int(CullMode::size));
 }
 
 void dae::SoftwareRenderer::Initialize(std::vector<Texture*>& mainTextures, Camera* pCamera, Mesh& vehicleMesh)

@@ -66,6 +66,7 @@ namespace dae
 	void CombinedRenderer::SwitchProcces()
 	{
 		if (m_IsGpuRunning) m_IsGpuRunning = false;
+
 		else m_IsGpuRunning = true;
 	}
 
@@ -85,12 +86,16 @@ namespace dae
 	void CombinedRenderer::ToggleCullMode()
 	{
 		if (m_IsGpuRunning) DxRenderer::DxToggleCullMode();
+
+		else SoftwareRenderer::SWToggleCullMode();
 	}
 
 
 	void CombinedRenderer::ToggleUniform()
 	{
 		if (m_IsGpuRunning) DxRenderer::DxToggleUniform();
+
+		else SoftwareRenderer::ToggleUniformColor();
 	}
 
 

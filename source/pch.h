@@ -25,6 +25,6 @@
 #include "ColorRGB.h"
 
 //colors
-#define COLOR_UNIFORM ColorRGB{1.f, 1.f, 1.f}
+#define COLOR_UNIFORM ColorRGB{.1f, .1f, .1f}
 #define COLOR_SOFTWARE ColorRGB{.39f, .39f, .39f}
 #define COLOR_HARDWARE ColorRGB{.39f, .59f, .93f}

@@ -34,6 +34,7 @@ namespace dae
 		void ToggleNormalMap();
 		void ToggleBoundingBox();
 		void ToggleUniformColor();
+		void SWToggleCullMode();
 		void Initialize(std::vector<Texture*>& mainTextures, Camera* pCamera, Mesh& vehicleMesh);
 
 	private:
@@ -89,5 +90,13 @@ namespace dae
 		RenderState m_CurrentRenderState;
 
 		bool m_IsUniform;
+
+		enum class CullMode
+		{
+			frontFace, backFace, none, size = 3
+		};
+
+		CullMode m_CullMode;
+		
 	};
 }
