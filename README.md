@@ -1,7 +1,7 @@
 # GP1_DualRasterizer_22-23
 Time to combine
 
-This project was an exam assingment I did at howest DAE for my second year first semester
+This project was an exam assignment I did at howest DAE for the course graphics programming
 
 Full dual rasterizer, Hardware and software. 
 
